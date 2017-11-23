@@ -1,0 +1,26 @@
+{
+  "name": "msnt-webpack-rtl-plugin",
+  "version": "1.0.0",
+  "description": "Simple plugin to generate RTL version of CSS files with customizable output path",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/esjs/msnt-webpack-rtl-plugin.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "postcss": "^6.0.14",
+    "postcss-url": "^7.2.1",
+    "rtlcss": "^2.2.1",
+    "webpack-sources": "^1.0.2"
+  },
+  "bugs": {
+    "url": "https://github.com/esjs/msnt-webpack-rtl-plugin/issues"
+  },
+  "homepage": "https://github.com/esjs/msnt-webpack-rtl-plugin#readme"
+}
