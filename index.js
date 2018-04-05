@@ -32,7 +32,7 @@ class MsntWebpackRtlPlugin {
               to: `./${this.options.dist}`,
             }).css;
 
-          const newFilename = `${this.options.dist}${path.basename(file, '.css')}.rtl.css`;
+          const newFilename = `${this.options.dist}${path.basename(file, '.css')}.css`;
 
           compilation.assets[newFilename] = new ConcatSource(rtlSource)
         });
