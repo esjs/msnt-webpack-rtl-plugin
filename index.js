@@ -18,7 +18,12 @@ class MsntWebpackRtlPlugin {
         chunk.files.forEach(file => {
           if (path.extname(file) !== '.css') return;
 
-          const source = compilation.assets[file].source();
+          const source = compilation.assets[file]
+            .source()
+            // fix for last rule in CSS
+            // last rule doesn't have semicolon which will break RTL behaviour
+            .replace(/(\/\*!rtl:.*?\*\/)}/g, '$1;}');
+
           const rtlSource = postcss()
             .use(postcssUrl({
               url: 'rebase'
