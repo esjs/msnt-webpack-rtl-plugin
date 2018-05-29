@@ -34,7 +34,7 @@ class MsntWebpackRtlPlugin {
               this.options.hooks
             ]))
             .process(source, {
-              to: `./${this.options.dist}`,
+              to: `./${this.options.dist}${file}`,
             }).css;
 
           const newFilename = `${this.options.dist}${path.basename(file, '.css')}.css`;

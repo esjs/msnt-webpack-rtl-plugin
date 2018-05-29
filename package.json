@@ -1,6 +1,6 @@
 {
   "name": "msnt-webpack-rtl-plugin",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Simple plugin to generate RTL version of CSS files with customizable output path",
   "main": "index.js",
   "scripts": {
