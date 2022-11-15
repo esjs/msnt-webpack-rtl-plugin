@@ -23,6 +23,8 @@ class MsntWebpackRtlPlugin {
           chunk.files.forEach(file => {
             if (path.extname(file) !== '.css') return;
 
+            const distPath = `./${this.options.dist}${file}`;
+
             const source = compilation.assets[file]
               .source()
               // fix for last rule in CSS
@@ -43,13 +45,10 @@ class MsntWebpackRtlPlugin {
                 ])
               )
               .process(source, {
-                to: `./${this.options.dist}${file}`
+                to: distPath
               }).css;
 
-            const newFilename = `${this.options.dist}${path.basename(
-              file,
-              '.css'
-            )}.css`;
+            const newFilename = distPath;
 
             compilation.assets[newFilename] = new ConcatSource(rtlSource);
           });
