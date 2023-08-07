@@ -26,6 +26,8 @@ class MsntWebpackRtlPlugin {
             stage: Compilation.PROCESS_ASSETS_STAGE_ADDITIONS,
           },
           async (assets, done) => {
+            let promises = [];
+
             compilation.chunks.forEach((chunk) => {
               chunk.files.forEach((file) => {
                 if (path.extname(file) !== '.css') return;
@@ -35,10 +37,10 @@ class MsntWebpackRtlPlugin {
                 const source = compilation.assets[file]
                   .source()
                   // fix for last rule in CSS
-                  // last rule doesn't have semicolon which will break RTL behaviour
+                  // last rule doesn't have semicolon which will break RTL behavior
                   .replace(/(\/\*!rtl:.*?\*\/)}/g, '$1;}');
 
-                const rtlSource = postcss()
+                const promise = postcss()
                   .use(
                     postcssUrl({
                       url: 'rebase',
@@ -53,15 +55,18 @@ class MsntWebpackRtlPlugin {
                   )
                   .process(source, {
                     to: distPath,
-                  }).css;
+                  })
+                  .then(({ css }) => {
+                    compilation.assets[distPath] = new ConcatSource(css);
+                  });
 
-                const newFilename = distPath;
-
-                compilation.assets[newFilename] = new ConcatSource(rtlSource);
+                promises.push(promise);
               });
             });
 
-            done();
+            Promise.all(promises).then(() => {
+              done();
+            });
           }
         );
       }
