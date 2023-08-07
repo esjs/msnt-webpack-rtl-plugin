@@ -4,57 +4,66 @@ const postcss = require('postcss');
 const rtlcss = require('rtlcss');
 const postcssUrl = require('postcss-url');
 const { ConcatSource } = require('webpack-sources');
+const { Compilation } = require('webpack');
 
 class MsntWebpackRtlPlugin {
   constructor(options) {
     this.options = Object.assign(
       {
-        dist: 'rtl/'
+        dist: 'rtl/',
       },
       options
     );
   }
 
   apply(compiler) {
-    compiler.hooks.emit.tapAsync(
+    compiler.hooks.thisCompilation.tap(
       'MsntWebpackRtlPlugin',
-      (compilation, callback) => {
-        compilation.chunks.forEach(chunk => {
-          chunk.files.forEach(file => {
-            if (path.extname(file) !== '.css') return;
+      (compilation) => {
+        compilation.hooks.processAssets.tapAsync(
+          {
+            name: 'MsntWebpackRtlPlugin',
+            stage: Compilation.PROCESS_ASSETS_STAGE_ADDITIONS,
+          },
+          async (assets, done) => {
+            compilation.chunks.forEach((chunk) => {
+              chunk.files.forEach((file) => {
+                if (path.extname(file) !== '.css') return;
 
-            const distPath = `./${this.options.dist}${file}`;
+                const distPath = `./${this.options.dist}${file}`;
 
-            const source = compilation.assets[file]
-              .source()
-              // fix for last rule in CSS
-              // last rule doesn't have semicolon which will break RTL behaviour
-              .replace(/(\/\*!rtl:.*?\*\/)}/g, '$1;}');
+                const source = compilation.assets[file]
+                  .source()
+                  // fix for last rule in CSS
+                  // last rule doesn't have semicolon which will break RTL behaviour
+                  .replace(/(\/\*!rtl:.*?\*\/)}/g, '$1;}');
 
-            const rtlSource = postcss()
-              .use(
-                postcssUrl({
-                  url: 'rebase'
-                })
-              )
-              .use(
-                rtlcss([
-                  this.options.options,
-                  this.options.plugins,
-                  this.options.hooks
-                ])
-              )
-              .process(source, {
-                to: distPath
-              }).css;
+                const rtlSource = postcss()
+                  .use(
+                    postcssUrl({
+                      url: 'rebase',
+                    })
+                  )
+                  .use(
+                    rtlcss([
+                      this.options.options,
+                      this.options.plugins,
+                      this.options.hooks,
+                    ])
+                  )
+                  .process(source, {
+                    to: distPath,
+                  }).css;
 
-            const newFilename = distPath;
+                const newFilename = distPath;
 
-            compilation.assets[newFilename] = new ConcatSource(rtlSource);
-          });
-        });
+                compilation.assets[newFilename] = new ConcatSource(rtlSource);
+              });
+            });
 
-        callback();
+            done();
+          }
+        );
       }
     );
   }
